@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Richard Matthews | Current Projects</title>
+
+  <!-- Fonts and Frameworks -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .masonry {
+      column-count: 3;
+      column-gap: 1rem;
+    }
+
+    @media (max-width: 992px) {
+      .masonry {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .masonry {
+        column-count: 1;
+      }
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+    }
+
+    footer {
+      background-color: #222;
+      color: #fff;
+    }
+
+    .navbar-brand {
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#">RNMCarpentry</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="./index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="./current_projects.html">Current Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="./gallery.html">Gallery</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <section class="pt-5 mt-5 bg-light text-center">
+    <div class="container py-5">
+      <h1 class="mb-3">Current Projects</h1>
+      <p class="lead">Some highlights of woodworking and shipbuilding projects I'm working on right now.</p>
+    </div>
+  </section>
+
+  <!-- Masonry Cards -->
+  <section class="container pb-5">
+    <div class="masonry">
+
+      <!-- Short Card -->
+      <div class="masonry-item">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Vintage Tool Restoration</h5>
+            <p class="card-text">Restoring a set of early 20th-century hand tools to working condition.</p>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="tool">
+              <img src="images/image_2.jpg" alt="Tool restoration">
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medium Card -->
+      <div class="masonry-item">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Garden Bench Build</h5>
+            <p class="card-text">Building a custom bench with curved arms and back slats using reclaimed timber.</p>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="bench">
+              <img src="images/image_2.jpg" alt="Bench stage 1">
+            </a>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="bench">
+              <img src="images/image_2.jpg" alt="Bench stage 2">
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tall Card with More Text -->
+      <div class="masonry-item">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Ship Deck Repair Project</h5>
+            <p class="card-text">
+              This long-term project involves replacing sections of the deck on a 1960s timber sailing vessel. 
+              The original decking was suffering from rot, and we’re using seasoned marine hardwoods to ensure longevity. 
+              Work includes re-sealing seams, fabricating custom support ribs, and sanding entire surfaces for re-oiling.
+            </p>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="deck">
+              <img src="images/image_2.jpg" alt="Deck 1">
+            </a>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="deck">
+              <img src="images/image_2.jpg" alt="Deck 2">
+            </a>
+            <a href="images/image_2.jpg" class="glightbox" data-gallery="deck">
+              <img src="images/image_2.jpg" alt="Deck 3">
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 mt-5">
+    &copy; <script>document.write(new Date().getFullYear());</script> Richard Matthews. All rights reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+  <script>
+    AOS.init();
+    const lightbox = GLightbox({ selector: '.glightbox' });
+  </script>
+</body>
+</html>

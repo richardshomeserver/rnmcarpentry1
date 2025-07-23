@@ -1,0 +1,30 @@
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+section {
+  scroll-margin-top: 70px;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.divider {
+  height: 4px;
+  background: linear-gradient(to right, #333, #aaa, #333);
+  opacity: 0.3;
+}
