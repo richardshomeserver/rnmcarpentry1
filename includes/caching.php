@@ -21,10 +21,17 @@ function getCachedPage(string $key, int $ttl = 3600): ?string {
     
     $cacheFile = $cacheDir . hash('sha256', $key) . '.cache';
     if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl > time())) {
-        return file_get_contents($cacheFile);
+        return safeReadFile($cacheFile);
     }
     return null;
 }
+function safeReadFile(string $path): ?string {
+    if (is_readable($path)) {
+        return file_get_contents($path);
+    }
+    return null;
+}
+
 
 /**
  * Save the generated page content to cache
