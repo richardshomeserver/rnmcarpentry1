@@ -3,7 +3,7 @@ require_once './includes/functions.php';
 require_once './includes/caching.php';
 startCaching();
 $baseDirs = ['./images/current_projects', './images/portfolio'];
-$cacheKey = 'gallery_folders_' . md5(implode(',', $baseDirs));
+$cacheKey = 'gallery_folders_' . hash('sha256', implode(',', $baseDirs));
 $folders = getCachedData($cacheKey);
 if ($folders === null) {
   $folders = [];

@@ -18,8 +18,8 @@ if (!file_exists($cacheDir)) {
  */
 function getCachedPage(string $key, int $ttl = 3600): ?string {
     global $cacheDir;
-
-    $cacheFile = $cacheDir . md5($key) . '.cache';
+    
+    $cacheFile = $cacheDir . hash('sha256', $key) . '.cache';
     if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl > time())) {
         return file_get_contents($cacheFile);
     }
@@ -35,7 +35,7 @@ function getCachedPage(string $key, int $ttl = 3600): ?string {
 function saveCache(string $key, string $content): void {
     global $cacheDir;
 
-    $cacheFile = $cacheDir . md5($key) . '.cache';
+    $cacheFile = $cacheDir . hash('sha256', $key) . '.cache';
     file_put_contents($cacheFile, $content);
 }
 
