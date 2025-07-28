@@ -23,7 +23,7 @@ function setCachedData(string $key, mixed $data): void {
 
 // Portfolio logic
 function getProjectFolders(string $path): array {
-  $cacheKey = 'folders_' . md5($path);
+  $cacheKey = 'folders_' . hash('sha256', $path);
   $cached = getCachedData($cacheKey);
   if ($cached !== null) return $cached;
 
@@ -97,7 +97,8 @@ function renderPortfolioCards(array $folders): void {
     $imgCount = count($mainImages);
     [$cardTitle, $description] = getDescriptionAndTitle($mainFolder, basename($folderPath));
     $cardClass = getCardClass($imgCount);
-    $galleryId = md5($folderPath);
+    $galleryId = hash('sha256', $folderPath);
+
 
     echo "<div class=\"$cardClass\" data-aos=\"fade-up\">";
     if ($imgCount === 1) {
