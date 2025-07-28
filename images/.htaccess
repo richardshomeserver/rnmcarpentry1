@@ -1,0 +1,15 @@
+# ==================================================
+# Block PHP Execution in /images/ and subfolders
+# ==================================================
+<FilesMatch "\.(php|phtml|php5|phps)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# ==================================================
+# Block Access to Sensitive Files
+# ==================================================
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|bak|sql)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>

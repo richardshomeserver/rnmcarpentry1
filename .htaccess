@@ -1,0 +1,132 @@
+# ==================================================
+# Enable Rewrite Engine
+# ==================================================
+RewriteEngine On
+
+# ==================================================
+# 1. Force HTTPS (SSL)
+# ==================================================
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ==================================================
+# 2. Force WWW (choose only one option below)
+# ==================================================
+RewriteCond %{HTTP_HOST} ^rnmcarpentry\.co\.uk [NC]
+RewriteRule ^(.*)$ https://www.rnmcarpentry.co.uk/$1 [L,R=301]
+
+# ==================================================
+# 3. Enable mod_pagespeed (Automatic Minification)
+# ==================================================
+<IfModule pagespeed_module>
+  ModPagespeed on
+
+  # Enable specific filters for minification
+  ModPagespeedEnableFilters rewrite_css
+  ModPagespeedEnableFilters rewrite_javascript
+  ModPagespeedEnableFilters collapse_whitespace
+  ModPagespeedEnableFilters remove_comments
+  ModPagespeedEnableFilters elide_attributes
+</IfModule>
+
+# ==================================================
+# 4. Browser Caching
+# ==================================================
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 year"
+
+  # Images
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+
+  # Static content
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# ==================================================
+# 5. Gzip Compression
+# ==================================================
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json
+</IfModule>
+
+# ==================================================
+# 6. Prevent Image Hotlinking
+# ==================================================
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https?://(www\.)?rnmcarpentry\.co\.uk/ [NC]
+RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F]
+
+# ==================================================
+# 7. Custom 404 Error Page
+# ==================================================
+ErrorDocument 404 /404.html
+
+# ==================================================
+# 8. Disable Directory Listing
+# ==================================================
+Options -Indexes
+
+# ==================================================
+# 9. Clean URLs (No .php extension)
+# ==================================================
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)$ $1.php [L]
+
+# ==================================================
+# 10. Block Bad Bots
+# ==================================================
+SetEnvIf User-Agent "BadBot" bad_bot
+Deny from env=bad_bot
+
+# ==================================================
+# 11. Block Sensitive Files
+# ==================================================
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|bak|sql)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# ==================================================
+# 12. Security Headers
+# ==================================================
+# Clickjacking protection
+Header always set X-Frame-Options "DENY"
+
+# Enforce HTTPS for 2 years + preload
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+
+# Block content-type sniffing
+Header set X-Content-Type-Options "nosniff"
+
+# Disable legacy XSS protection (use CSP instead)
+Header set X-XSS-Protection "0"
+
+# Control referrer privacy
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Restrict browser feature access
+Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+# Gzip Compression (mod_deflate)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json image/svg+xml application/font-woff application/font-ttf
+  DeflateCompressionLevel 6
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+  Header append Vary User-Agent
+</IfModule>
+
+# Brotli Compression (mod_brotli)
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css application/javascript application/json image/svg+xml application/font-woff application/font-ttf
+  BrotliCompressionQuality 4
+  Header append Vary Accept-Encoding
+</IfModule>
