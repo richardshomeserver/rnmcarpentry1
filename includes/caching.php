@@ -1,6 +1,5 @@
 <?php
-// Full-page Caching
-// Define cache directory and cache time-to-live (TTL) in seconds
+// === CONFIGURATION ===
 $cacheDir = __DIR__ . '/cache/';
 $cacheTTL = 3600; // 1 hour
 
@@ -9,79 +8,88 @@ if (!file_exists($cacheDir)) {
     mkdir($cacheDir, 0755, true);
 }
 
+// === HELPERS ===
+
 /**
- * Check if a cached version of the current page exists and is still valid
- *
- * @param string $key Cache key based on the URL or page
- * @param int $ttl Cache time-to-live in seconds
- * @return string|null Cached content or null if not valid
+ * Generate a secure, hashed cache key based on the request URL
  */
-function getCachedPage(string $key, int $ttl = 3600): ?string {
-    global $cacheDir;
-    
-    $cacheFile = $cacheDir . hash('sha256', $key) . '.cache';
-    if (file_exists($cacheFile) && (filemtime($cacheFile) + $ttl > time())) {
-        return safeReadFile($cacheFile);
-    }
-    return null;
+function generateCacheKey(): string {
+    $url = $_SERVER['REQUEST_URI'];
+    // Optionally: normalize or strip query strings if you don't need them
+    return hash('sha256', $url);
 }
-function safeReadFile(string $path): ?string {
-    if (is_readable($path)) {
-        return file_get_contents($path);
-    }
-    return null;
-}
-
 
 /**
- * Save the generated page content to cache
- *
- * @param string $key Cache key based on the URL or page
- * @param string $content Page content to cache
+ * Get the absolute and validated path to a cache file
+ */
+function getCacheFilePath(string $key): ?string {
+    global $cacheDir;
+
+    $cacheFile = $cacheDir . $key . '.cache';
+    $realCacheFile = realpath($cacheFile);
+
+    // If file doesn't exist yet, realpath returns false
+    if ($realCacheFile === false && str_contains($cacheFile, '..') === false) {
+        return $cacheFile; // Safe to create
+    }
+
+    // Validate the resolved path is still inside the cache directory
+    $realCacheDir = realpath($cacheDir);
+    if ($realCacheFile && strpos($realCacheFile, $realCacheDir) === 0) {
+        return $realCacheFile;
+    }
+
+    return null; // Invalid / malicious path
+}
+
+/**
+ * Safely read the cached file content
+ */
+function getCachedPage(string $key, int $ttl): ?string {
+    $filePath = getCacheFilePath($key);
+    if (!$filePath || !file_exists($filePath)) return null;
+
+    if (filemtime($filePath) + $ttl > time() && is_readable($filePath)) {
+        return file_get_contents($filePath);
+    }
+    return null;
+}
+
+/**
+ * Save the generated content to a cache file
  */
 function saveCache(string $key, string $content): void {
-    global $cacheDir;
-
-    $cacheFile = $cacheDir . hash('sha256', $key) . '.cache';
-    file_put_contents($cacheFile, $content);
+    $filePath = getCacheFilePath($key);
+    if ($filePath) {
+        file_put_contents($filePath, $content, LOCK_EX);
+    }
 }
 
 /**
- * Start output buffering and handle the cache logic
+ * Start caching (checks for cached content and serves it if available)
  */
 function startCaching(): void {
-    global $cacheDir;
+    global $cacheTTL;
+    $key = generateCacheKey();
+    $cachedContent = getCachedPage($key, $cacheTTL);
 
-    $url = $_SERVER['REQUEST_URI'];
-    $cachedContent = getCachedPage($url, $GLOBALS['cacheTTL']);
-
-    // If there's a cached version of the page, serve it and exit
     if ($cachedContent !== null) {
-        echo sanitizeOutput($cachedContent);
+        header('X-Cache: HIT');
+        echo $cachedContent;
         exit;
     }
 
-    function sanitizeOutput(string $html): string {
-    // This is a no-op now, but a placeholder to satisfy Snyk
-    // You could add stripping tags or allow-listing if needed
-    return $html;
-}
-
-    // Start output buffering to capture the page content
     ob_start();
 }
 
 /**
- * End output buffering and save the generated content to the cache
+ * End caching (stores output in cache and prints it)
  */
 function endCaching(): void {
-    global $cacheDir;
-
-    // Capture the generated content and save it to the cache
+    $key = generateCacheKey();
     $content = ob_get_clean();
-    $url = $_SERVER['REQUEST_URI'];
-    saveCache($url, $content);
 
-    // Output the page content
+    // Optional: sanitize or validate here if dynamic user input is involved
+    saveCache($key, $content);
     echo $content;
 }
