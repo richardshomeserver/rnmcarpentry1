@@ -33,7 +33,7 @@ $currentprojectsFolders = getProjectFolders('./images/current_projects'); ?>
   <script src=https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js></script>
   <script src=https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js></script>
   <script src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js async></script>
-  <script src=./scripts/scripts.js></script>
+  <script defer src=./scripts/scripts.js></script>
 </body>
 
 </html>

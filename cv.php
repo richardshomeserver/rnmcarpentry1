@@ -10,20 +10,22 @@ startCaching(); ?>
   <title>My CV</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel=stylesheet>
   <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css rel=stylesheet>
-  <link rel=stylesheet href=./styles/styles.css>
+  <link defer rel=stylesheet href=./styles/styles.css>
 </head>
 
 <body class="bg-light">
   <?php include './includes/navbar.php'; ?>
   <div class=cv-page-container>
     <div class=cv-page>
-      <img src=./images/cv/1.jpg alt="CV Page 1">
+      <img src=./images/cv/CV1.webp alt="CV Page 1">
     </div>
     <div class=cv-page>
-      <img src=./images/cv/2.jpg alt="CV Page 2">
+      <img src=./images/cv/CV2.webp alt="CV Page 2">
     </div>
   </div>
   <?php include './includes/footer.php'; ?>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
 </body>
 
 </html>
