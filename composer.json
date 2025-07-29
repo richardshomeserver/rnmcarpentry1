@@ -1,0 +1,7 @@
+{
+    "name": "website/rnmcarpentry",
+    "description": "portfolio website",
+    "require": {
+        "twig/twig": "^3.0"
+    }
+}
