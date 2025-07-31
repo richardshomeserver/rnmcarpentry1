@@ -1,95 +1,63 @@
 <?php
-// === CONFIGURATION ===
+// CONFIG
 $cacheDir = __DIR__ . '/cache/';
-$cacheTTL = 3600; // 1 hour
+$cacheTTL = 0; // Cache never expires
 
-// Ensure the cache directory exists
 if (!file_exists($cacheDir)) {
     mkdir($cacheDir, 0755, true);
 }
 
-// === HELPERS ===
-
-/**
- * Generate a secure, hashed cache key based on the request URL
- */
 function generateCacheKey(): string {
-    $url = $_SERVER['REQUEST_URI'];
-    // Optionally: normalize or strip query strings if you don't need them
-    return hash('sha256', $url);
+    return hash('sha256', $_SERVER['REQUEST_URI']);
 }
 
-/**
- * Get the absolute and validated path to a cache file
- */
 function getCacheFilePath(string $key): ?string {
     global $cacheDir;
-
-    $cacheFile = $cacheDir . $key . '.cache';
-    $realCacheFile = realpath($cacheFile);
-
-    // If file doesn't exist yet, realpath returns false
-    if ($realCacheFile === false && str_contains($cacheFile, '..') === false) {
-        return $cacheFile; // Safe to create
-    }
-
-    // Validate the resolved path is still inside the cache directory
-    $realCacheDir = realpath($cacheDir);
-    if ($realCacheFile && strpos($realCacheFile, $realCacheDir) === 0) {
-        return $realCacheFile;
-    }
-
-    return null; // Invalid / malicious path
-}
-
-/**
- * Safely read the cached file content
- */
-function getCachedPage(string $key, int $ttl): ?string {
-    $filePath = getCacheFilePath($key);
-    if (!$filePath || !file_exists($filePath)) return null;
-
-    if (filemtime($filePath) + $ttl > time() && is_readable($filePath)) {
-        return file_get_contents($filePath);
+    $file = $cacheDir . $key . '.cache';
+    $real = realpath($file);
+    $realDir = realpath($cacheDir);
+    if (($real === false && !str_contains($file, '..')) || ($real && str_starts_with($real, $realDir))) {
+        return $file;
     }
     return null;
 }
 
-/**
- * Save the generated content to a cache file
- */
+function getCachedPage(string $key, int $ttl): ?string {
+    $path = getCacheFilePath($key);
+    if (!$path || !file_exists($path)) return null;
+    if (filemtime($path) + $ttl < time() || !is_readable($path)) return null;
+    return file_get_contents($path);
+}
+
 function saveCache(string $key, string $content): void {
-    $filePath = getCacheFilePath($key);
-    if ($filePath) {
-        file_put_contents($filePath, $content, LOCK_EX);
+    $path = getCacheFilePath($key);
+    if ($path) {
+        file_put_contents($path, $content, LOCK_EX);
     }
 }
 
-/**
- * Start caching (checks for cached content and serves it if available)
- */
 function startCaching(): void {
     global $cacheTTL;
     $key = generateCacheKey();
-    $cachedContent = getCachedPage($key, $cacheTTL);
-
-    if ($cachedContent !== null) {
+    $cached = getCachedPage($key, $cacheTTL);
+    if ($cached !== null) {
         header('X-Cache: HIT');
-        echo $cachedContent;
+        header('Vary: Accept-Encoding');
+        echo $cached;
         exit;
     }
-
-    ob_start();
+    // Use ob_gzhandler as callback so PHP handles compression automatically
+    ob_start('ob_gzhandler');
 }
 
-/**
- * End caching (stores output in cache and prints it)
- */
 function endCaching(): void {
     $key = generateCacheKey();
+    // Flush buffer (compressed if client supports it)
     $content = ob_get_clean();
-
-    // Optional: sanitize or validate here if dynamic user input is involved
+    if ($content === false) {
+        // failure reading buffer
+        return;
+    }
     saveCache($key, $content);
     echo $content;
 }

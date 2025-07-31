@@ -91,6 +91,13 @@ function renderHiddenLightboxLink(string $imgPath, string $galleryId): void {
     echo "<a href=\"$imgUrl\" class=\"glightbox d-none\" data-gallery=\"$galleryId\"></a>";
 }
 
+function generateIdFromTitle(string $title): string {
+    // Allow both uppercase and lowercase during replace, then lowercase the result
+    $clean = preg_replace('/[^A-Za-z0-9]+/', '-', $title);
+    return strtolower(trim($clean, '-'));
+}
+
+
 function renderPortfolioCards(array $folders): void {
     if (empty($folders)) {
         echo "<p>No projects found.</p>";
@@ -116,7 +123,8 @@ function renderPortfolioCards(array $folders): void {
         $cardClass = getCardClass($imgCount);
         $galleryId = hash('sha256', $folderPath);
 
-        echo "<div class=\"$cardClass\" data-aos=\"fade-up\">";
+        $cardId = generateIdFromTitle($cardTitle);
+        echo "<div id=\"$cardId\" class=\"$cardClass\" data-aos=\"fade-up\">";
         if ($imgCount === 1) {
             renderImageLink($mainImages[0], $galleryId);
         } else {

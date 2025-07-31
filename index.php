@@ -3,7 +3,31 @@ require_once './includes/functions.php';
 require_once './includes/caching.php';
 startCaching();
 $yachtingFolders = getProjectFolders('./images/portfolio/Yachting');
-$personalFolders = getProjectFolders('./images/portfolio/Personal'); ?>
+
+$projects = getProjectFolders('./images/portfolio/Yachting');
+
+$anchors = [];
+
+foreach ($projects as $projPath) {
+    $folder = basename($projPath);
+    $txtFiles = glob(__DIR__ . "/images/portfolio/Yachting/{$folder}/main/*.txt");
+
+    if ($txtFiles && !empty($txtFiles)) {
+        // get filename without extension
+        $filename = pathinfo($txtFiles[0], PATHINFO_FILENAME);
+    } else {
+        $filename = $folder;
+    }
+
+    // normalize it for use as anchor id
+    $anchorId = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $filename));
+    $anchors[$folder] = [
+        'title'    => $filename,
+        'anchorId' => $anchorId
+    ];
+}
+
+?>
 <!doctype html>
 <html lang=en>
 
@@ -59,15 +83,6 @@ $personalFolders = getProjectFolders('./images/portfolio/Personal'); ?>
     </div>
     <div class="portfolio-grid container">
       <?php renderPortfolioCards($yachtingFolders); ?>
-    </div>
-  </section>
-  <section id=personal-work aria-label="My Personal Work" class="portfolio-grid-wrapper container-fluid py-5 bg-light">
-    <div class="section-heading text-center text-dark">
-      <h2>My Personal Work</h2><br>
-      <div class=section-underline></div>
-    </div>
-    <div class="portfolio-grid container">
-      <?php renderPortfolioCards($personalFolders); ?>
     </div>
   </section>
   <?php include './includes/footer.php'; ?>

@@ -20,8 +20,6 @@ RewriteRule ^(.*)$ https://www.rnmcarpentry.co.uk/$1 [L,R=301]
 # ==================================================
 <IfModule pagespeed_module>
   ModPagespeed on
-
-  # Enable specific filters for minification
   ModPagespeedEnableFilters rewrite_css
   ModPagespeedEnableFilters rewrite_javascript
   ModPagespeedEnableFilters collapse_whitespace
@@ -30,24 +28,29 @@ RewriteRule ^(.*)$ https://www.rnmcarpentry.co.uk/$1 [L,R=301]
 </IfModule>
 
 # ==================================================
-# 4. Browser Caching
+# 4. Browser Caching (Expires headers) - set to 10 years (effectively never expire)
 # ==================================================
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresDefault "access plus 1 year"
+  ExpiresDefault "access plus 10 years"
 
   # Images
-  ExpiresByType image/jpg "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/gif "access plus 1 year"
-  ExpiresByType image/webp "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/jpg "access plus 10 years"
+  ExpiresByType image/jpeg "access plus 10 years"
+  ExpiresByType image/png "access plus 10 years"
+  ExpiresByType image/gif "access plus 10 years"
+  ExpiresByType image/webp "access plus 10 years"
+  ExpiresByType image/svg+xml "access plus 10 years"
+
+  # Fonts
+  ExpiresByType font/woff2 "access plus 10 years"
+  ExpiresByType font/woff "access plus 10 years"
+  ExpiresByType application/font-woff2 "access plus 10 years"
 
   # Static content
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
-  ExpiresByType text/html "access plus 1 day"
+  ExpiresByType text/css "access plus 10 years"
+  ExpiresByType application/javascript "access plus 10 years"
+  ExpiresByType text/html "access plus 10 years"
 </IfModule>
 
 # ==================================================
@@ -97,22 +100,11 @@ Deny from env=bad_bot
 # ==================================================
 # 12. Security Headers
 # ==================================================
-# Clickjacking protection
 Header always set X-Frame-Options "DENY"
-
-# Enforce HTTPS for 2 years + preload
 Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
-
-# Block content-type sniffing
 Header set X-Content-Type-Options "nosniff"
-
-# Disable legacy XSS protection (use CSP instead)
 Header set X-XSS-Protection "0"
-
-# Control referrer privacy
 Header set Referrer-Policy "strict-origin-when-cross-origin"
-
-# Restrict browser feature access
 Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 
 # Gzip Compression (mod_deflate)
@@ -129,4 +121,13 @@ Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css application/javascript application/json image/svg+xml application/font-woff application/font-ttf
   BrotliCompressionQuality 4
   Header append Vary Accept-Encoding
+</IfModule>
+
+# ==================================================
+# 13. Cache-Control Headers (for faster repeat visits) - set to 10 years (effectively never expire)
+# ==================================================
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|jpg|jpeg|png|gif|svg|css|js|woff2|woff|ttf)$">
+    Header set Cache-Control "public, max-age=315360000, immutable"
+  </FilesMatch>
 </IfModule>
